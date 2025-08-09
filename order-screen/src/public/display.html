@@ -5,41 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Display</title>
   <style>
-    body {
+    html, body {
       background-color: #000000;
       color: #ffffff;
       font-family: Arial, Helvetica, sans-serif;
       margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden; /* Hide any body overflow */
+      padding: 0; /* Remove padding to maximize space */
+      height: 100%;
+      overflow: hidden; /* Hide any overflow */
     }
     h1 {
       font-size: 60px;
       color: #F1F2F1;
-      margin-bottom: 20px;
+      margin: 10px 0; /* Reduced margin */
       text-align: center;
     }
     .order-container {
       width: 100%;
-      max-width: 1920px; /* Optimized for 16:9 (1920x1080) */
-      height: calc(100vh - 100px); /* Fit 16:9 screen */
+      max-width: 1920px; /* Fit 16:9 (1920x1080) */
+      height: calc(100% - 80px); /* Fit header, no overflow */
       display: flex;
       flex-direction: row;
-      gap: 20px;
+      gap: 10px; /* Reduced gap */
       flex-wrap: nowrap;
+      box-sizing: border-box;
     }
     .order-column {
-      flex: 1; /* Equal width */
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      padding: 20px;
+      gap: 10px;
+      padding: 10px;
       border-radius: 10px;
-      overflow: hidden; /* Explicitly hide scrollbars */
+      box-sizing: border-box;
+      overflow: hidden; /* No scrollbars */
     }
     .green-column {
       background-color: #009246;
@@ -70,16 +69,16 @@
       }
       .order-container {
         flex-direction: column;
-        height: auto; /* Adjust for mobile */
+        height: auto;
       }
     }
     /* Hide scrollbars for all browsers */
-    .order-column::-webkit-scrollbar {
-      display: none; /* Chrome, Safari */
+    html::-webkit-scrollbar, body::-webkit-scrollbar, .order-column::-webkit-scrollbar {
+      display: none;
     }
-    .order-column {
-      -ms-overflow-style: none; /* IE, Edge */
-      scrollbar-width: none; /* Firefox */
+    html, body, .order-column {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
   </style>
 </head>
@@ -92,7 +91,8 @@
   </div>
 
   <script>
-    let orderAssignments = new Map(); // Track order-to-column assignments
+    // Persistent storage for order assignments
+    let orderAssignments = new Map();
 
     async function fetchOrders() {
       const response = await fetch('/orders');
@@ -108,27 +108,6 @@
       whiteColumn.innerHTML = '';
       redColumn.innerHTML = '';
 
-      // Count current orders in each column
-      let greenCount = 0, whiteCount = 0, redCount = 0;
-      orderAssignments.forEach((column) => {
-        if (column === 'green') greenCount++;
-        else if (column === 'white') whiteCount++;
-        else if (column === 'red') redCount++;
-      });
-
-      // Assign new orders to the least-filled column
-      orders.forEach((order) => {
-        if (!orderAssignments.has(order)) {
-          let minCount = Math.min(greenCount, whiteCount, redCount);
-          let targetColumn = greenCount === minCount ? 'green' :
-                            whiteCount === minCount ? 'white' : 'red';
-          orderAssignments.set(order, targetColumn);
-          if (targetColumn === 'green') greenCount++;
-          else if (targetColumn === 'white') whiteCount++;
-          else redCount++;
-        }
-      });
-
       // Remove assignments for deleted orders
       orderAssignments.forEach((column, order) => {
         if (!orders.includes(order)) {
@@ -136,7 +115,20 @@
         }
       });
 
-      // Display orders in their assigned columns
+      // Assign new orders to the least-filled column
+      orders.forEach((order) => {
+        if (!orderAssignments.has(order)) {
+          const greenCount = Array.from(orderAssignments.values()).filter(c => c === 'green').length;
+          const whiteCount = Array.from(orderAssignments.values()).filter(c => c === 'white').length;
+          const redCount = Array.from(orderAssignments.values()).filter(c => c === 'red').length;
+          const minCount = Math.min(greenCount, whiteCount, redCount);
+          const targetColumn = greenCount === minCount ? 'green' :
+                              whiteCount === minCount ? 'white' : 'red';
+          orderAssignments.set(order, targetColumn);
+        }
+      });
+
+      // Display orders in their assigned columns, preserving order
       orders.forEach((order) => {
         const orderDiv = document.createElement('div');
         orderDiv.className = 'order-item';
