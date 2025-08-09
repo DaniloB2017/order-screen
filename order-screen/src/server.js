@@ -8,7 +8,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 let orders = [];
-const PIN = process.env.PIN || '1234'; // Fallback PIN for testing
+const PIN = process.env.PIN || '1234'; // Uses Render environment variable
 const SESSION_SECRET = process.env.SESSION_SECRET || 'your-secret-key';
 
 // Authentication middleware
@@ -19,9 +19,9 @@ function isAuthenticated(req, res, next) {
   res.redirect('/login.html');
 }
 
-// Apply middleware to all routes except specific ones
+// Apply middleware to specific routes
 app.use((req, res, next) => {
-  if (['/login', '/login.html', '/ping', '/display.html'].includes(req.path)) {
+  if (['/login', '/login.html', '/ping', '/display.html', '/orders'].includes(req.path)) {
     return next();
   }
   isAuthenticated(req, res, next);
@@ -52,7 +52,7 @@ app.get('/orders', (req, res) => {
   res.json(orders);
 });
 
-app.post('/orders', (req, res) => {
+app.post('/orders', isAuthenticated, (req, res) => {
   const { orderNumber } = req.body;
   if (typeof orderNumber === 'number' && !orders.includes(orderNumber)) {
     orders.push(orderNumber);
@@ -63,7 +63,7 @@ app.post('/orders', (req, res) => {
   }
 });
 
-app.delete('/orders/:orderNumber', (req, res) => {
+app.delete('/orders/:orderNumber', isAuthenticated, (req, res) => {
   const orderNumber = parseInt(req.params.orderNumber);
   const index = orders.indexOf(orderNumber);
   if (index !== -1) {
