@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Control</title>
+  <style>
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 36px;
+      color: #009246;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .order-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .order-item {
+      background-color: #333333;
+      padding: 15px;
+      border: 2px solid #009246;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 15px;
+    }
+    input, button {
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    input {
+      width: 100px;
+    }
+    button {
+      background-color: #009246;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #006633;
+    }
+  </style>
+</head>
+<body>
+  <h1>Order Control</h1>
+  <div class="order-grid" id="orderGrid"></div>
+  <div class="controls">
+    <input type="number" id="orderInput" placeholder="Enter order #">
+    <button onclick="addOrder()">Add Order</button>
+    <button onclick="removeOrder()">Remove Order</button>
+  </div>
+
+  <script>
+    async function fetchOrders() {
+      const response = await fetch('/orders');
+      const orders = await response.json();
+      displayOrders(orders);
+    }
+
+    function displayOrders(orders) {
+      const grid = document.getElementById('orderGrid');
+      grid.innerHTML = '';
+      orders.forEach(order => {
+        const orderDiv = document.createElement('div');
+        orderDiv.className = 'order-item';
+        orderDiv.textContent = order;
+        grid.appendChild(orderDiv);
+      });
+    }
+
+    async function addOrder() {
+      const input = document.getElementById('orderInput');
+      const orderNumber = parseInt(input.value);
+      if (orderNumber) {
+        const response = await fetch('/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderNumber })
+        });
+        const result = await response.json();
+        if (result.success) {
+          displayOrders(result.orders);
+          input.value = '';
+        } else {
+          alert(result.error);
+        }
+      } else {
+        alert('Please enter a valid order number.');
+      }
+    }
+
+    async function removeOrder() {
+      const input = document.getElementById('orderInput');
+      const orderNumber = parseInt(input.value);
+      if (orderNumber) {
+        const response = await fetch(`/orders/${orderNumber}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderNumber })
+        });
+        const result = await response.json();
+        if (result.success) {
+          displayOrders(result.orders);
+          input.value = '';
+        } else {
+          alert(result.error);
+        }
+      } else {
+        alert('Please enter a valid order number.');
+      }
+    }
+
+    fetchOrders();
+    setInterval(fetchOrders, 1000);
+  </script>
+</body>
+</html>
