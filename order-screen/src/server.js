@@ -1,17 +1,17 @@
 const express = require('express');
 const path = require('path');
-const app = express();
 const cookieParser = require('cookie-parser');
+const app = express();
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public'), { index: false })); // Prevent auto-serving index.html
 
 let orders = [];
-const PIN = '2001'; // Hardcoded PIN (change as needed)
-const SESSION_SECRET = 'your-secret-key'; // Simple secret for session
+const PIN = '1234'; // Change to your preferred PIN
+const SESSION_SECRET = 'your-secret-key';
 
-// Middleware to check if user is authenticated
+// Authentication middleware
 function isAuthenticated(req, res, next) {
   if (req.cookies.session === SESSION_SECRET) {
     return next();
@@ -19,26 +19,35 @@ function isAuthenticated(req, res, next) {
   res.redirect('/login.html');
 }
 
+// Apply middleware to all routes except specific ones
+app.use((req, res, next) => {
+  if (['/login', '/login.html', '/orders', '/ping'].includes(req.path)) {
+    return next();
+  }
+  isAuthenticated(req, res, next);
+});
+
 // Login route
 app.post('/login', (req, res) => {
   const { pin } = req.body;
   if (pin === PIN) {
-    res.cookie('session', SESSION_SECRET, { httpOnly: true });
+    res.cookie('session', SESSION_SECRET, { httpOnly: true, maxAge: 86400000 }); // 24-hour cookie
     res.json({ success: true });
   } else {
     res.json({ success: false, error: 'Incorrect PIN' });
   }
 });
 
-// Protect routes
-app.get('/', isAuthenticated, (req, res) => {
+// Protected routes
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/display.html', isAuthenticated, (req, res) => {
+app.get('/display.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'display.html'));
 });
 
+// API routes (unprotected)
 app.get('/orders', (req, res) => {
   res.json(orders);
 });
