@@ -5,11 +5,11 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public'), { index: false })); // Prevent auto-serving index.html
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 let orders = [];
-const PIN = '2001'; // Change to your preferred PIN
-const SESSION_SECRET = 'your-secret-key';
+const PIN = process.env.PIN || '1234'; // Fallback PIN for testing
+const SESSION_SECRET = process.env.SESSION_SECRET || 'your-secret-key';
 
 // Authentication middleware
 function isAuthenticated(req, res, next) {
@@ -21,7 +21,7 @@ function isAuthenticated(req, res, next) {
 
 // Apply middleware to all routes except specific ones
 app.use((req, res, next) => {
-  if (['/login', '/login.html', '/orders', '/ping'].includes(req.path)) {
+  if (['/login', '/login.html', '/ping', '/display.html'].includes(req.path)) {
     return next();
   }
   isAuthenticated(req, res, next);
@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 app.post('/login', (req, res) => {
   const { pin } = req.body;
   if (pin === PIN) {
-    res.cookie('session', SESSION_SECRET, { httpOnly: true, maxAge: 86400000 }); // 24-hour cookie
+    res.cookie('session', SESSION_SECRET, { httpOnly: true, maxAge: 86400000 });
     res.json({ success: true });
   } else {
     res.json({ success: false, error: 'Incorrect PIN' });
@@ -47,7 +47,7 @@ app.get('/display.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'display.html'));
 });
 
-// API routes (unprotected)
+// API routes
 app.get('/orders', (req, res) => {
   res.json(orders);
 });
