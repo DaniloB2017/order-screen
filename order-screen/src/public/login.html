@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 36px;
+      color: #009246;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    input {
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      width: 100px;
+      text-align: center;
+    }
+    button {
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      background-color: #009246;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #006633;
+    }
+  </style>
+</head>
+<body>
+  <h1>Enter PIN</h1>
+  <div class="login-container">
+    <input type="password" id="pinInput" maxlength="4" inputmode="numeric" placeholder="4-digit PIN">
+    <button onclick="submitPin()">Submit</button>
+  </div>
+
+  <script>
+    async function submitPin() {
+      const pinInput = document.getElementById('pinInput');
+      const pin = pinInput.value;
+      if (pin.length === 4 && /^\d+$/.test(pin)) {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+        const result = await response.json();
+        if (result.success) {
+          window.location.href = '/'; // Redirect to control page
+        } else {
+          alert('Incorrect PIN. Please try again.');
+          pinInput.value = '';
+        }
+      } else {
+        alert('Please enter a 4-digit PIN.');
+        pinInput.value = '';
+      }
+    }
+  </script>
+</body>
+</html>
