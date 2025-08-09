@@ -10,25 +10,26 @@
       color: #ffffff;
       font-family: Arial, Helvetica, sans-serif;
       margin: 0;
-      padding: 0; /* Remove padding to maximize space */
+      padding: 0;
       height: 100%;
-      overflow: hidden; /* Hide any overflow */
+      overflow: hidden;
     }
     h1 {
       font-size: 60px;
       color: #F1F2F1;
-      margin: 10px 0; /* Reduced margin */
+      margin: 10px 0;
       text-align: center;
     }
     .order-container {
       width: 100%;
       max-width: 1920px; /* Fit 16:9 (1920x1080) */
-      height: calc(100% - 80px); /* Fit header, no overflow */
+      height: 70vh; /* Shorten columns to 70% of viewport height */
       display: flex;
       flex-direction: row;
-      gap: 10px; /* Reduced gap */
+      gap: 10px;
       flex-wrap: nowrap;
       box-sizing: border-box;
+      margin-bottom: 20px; /* Add space below columns */
     }
     .order-column {
       flex: 1;
@@ -36,9 +37,10 @@
       flex-direction: column;
       gap: 10px;
       padding: 10px;
-      border-radius: 10px;
+      border-radius: 10px; /* Rounded corners on all sides */
       box-sizing: border-box;
-      overflow: hidden; /* No scrollbars */
+      overflow: hidden;
+      background-clip: padding-box; /* Ensure background respects border-radius */
     }
     .green-column {
       background-color: #009246;
@@ -91,7 +93,6 @@
   </div>
 
   <script>
-    // Persistent storage for order assignments
     let orderAssignments = new Map();
 
     async function fetchOrders() {
@@ -108,14 +109,12 @@
       whiteColumn.innerHTML = '';
       redColumn.innerHTML = '';
 
-      // Remove assignments for deleted orders
       orderAssignments.forEach((column, order) => {
         if (!orders.includes(order)) {
           orderAssignments.delete(order);
         }
       });
 
-      // Assign new orders to the least-filled column
       orders.forEach((order) => {
         if (!orderAssignments.has(order)) {
           const greenCount = Array.from(orderAssignments.values()).filter(c => c === 'green').length;
@@ -128,7 +127,6 @@
         }
       });
 
-      // Display orders in their assigned columns, preserving order
       orders.forEach((order) => {
         const orderDiv = document.createElement('div');
         orderDiv.className = 'order-item';
