@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Display</title>
+  <style>
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 60px;
+      color: #F1F2F1;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .order-container {
+      width: 90%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .order-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .green-row {
+      background-color: #009246;
+    }
+    .white-row {
+      background-color: #F1F2F1;
+    }
+    .red-row {
+      background-color: #CE2B37;
+    }
+    .order-item {
+      text-align: center;
+      font-size: 48px;
+      font-weight: bold;
+    }
+    .green-row .order-item, .red-row .order-item {
+      color: #ffffff;
+    }
+    .white-row .order-item {
+      color: #000000;
+    }
+    @media (max-width: 800px) {
+      .order-item {
+        font-size: 36px;
+      }
+      h1 {
+        font-size: 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Deze bestellingen zijn klaar</h1>
+  <div class="order-container" id="orderContainer">
+    <div class="order-row green-row" id="greenRow"></div>
+    <div class="order-row white-row" id="whiteRow"></div>
+    <div class="order-row red-row" id="redRow"></div>
+  </div>
+
+  <script>
+    async function fetchOrders() {
+      const response = await fetch('/orders');
+      const orders = await response.json();
+      displayOrders(orders);
+    }
+
+    function displayOrders(orders) {
+      const greenRow = document.getElementById('greenRow');
+      const whiteRow = document.getElementById('whiteRow');
+      const redRow = document.getElementById('redRow');
+      greenRow.innerHTML = '';
+      whiteRow.innerHTML = '';
+      redRow.innerHTML = '';
+
+      const perRow = Math.ceil(orders.length / 3);
+      orders.forEach((order, index) => {
+        const orderDiv = document.createElement('div');
+        orderDiv.className = 'order-item';
+        orderDiv.textContent = order;
+        if (index < perRow) {
+          greenRow.appendChild(orderDiv);
+        } else if (index < 2 * perRow) {
+          whiteRow.appendChild(orderDiv);
+        } else {
+          redRow.appendChild(orderDiv);
+        }
+      });
+    }
+
+    fetchOrders();
+    setInterval(fetchOrders, 1000);
+  </script>
+</body>
+</html>
