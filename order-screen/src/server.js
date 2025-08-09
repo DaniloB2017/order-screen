@@ -8,7 +8,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'), { index: false })); // Prevent auto-serving index.html
 
 let orders = [];
-const PIN = '1234'; // Change to your preferred PIN
+const PIN = '2001'; // Change to your preferred PIN
 const SESSION_SECRET = 'your-secret-key';
 
 // Authentication middleware
