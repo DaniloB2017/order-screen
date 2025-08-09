@@ -22,13 +22,13 @@
     }
     .order-container {
       width: 100%;
-      max-width: 1920px; /* Fit 16:9 (1920x1080) */   
+      max-width: 1920px;
       display: flex;
       flex-direction: row;
       gap: 10px;
       flex-wrap: nowrap;
       box-sizing: border-box;
-      margin-bottom: 20px; /* Add space below columns */
+      margin-bottom: 20px;
     }
     .order-column {
       flex: 1;
@@ -36,10 +36,10 @@
       flex-direction: column;
       gap: 10px;
       padding: 10px;
-      border-radius: 10px; /* Rounded corners on all sides */
+      border-radius: 10px;
       box-sizing: border-box;
       overflow: hidden;
-      background-clip: padding-box; /* Ensure background respects border-radius */
+      background-clip: padding-box;
     }
     .green-column {
       background-color: #009246;
@@ -70,10 +70,8 @@
       }
       .order-container {
         flex-direction: column;
-        height: auto;
       }
     }
-    /* Hide scrollbars for all browsers */
     html::-webkit-scrollbar, body::-webkit-scrollbar, .order-column::-webkit-scrollbar {
       display: none;
     }
