@@ -26,19 +26,18 @@
       width: 90%;
       max-width: 1200px;
       display: flex;
-      flex-direction: row; /* Changed to row for vertical flag layout */
+      flex-direction: row; /* Vertical flag layout */
       gap: 20px;
       flex-wrap: nowrap;
-      height: calc(100vh - 120px); /* Adjust height to fit screen */
+      height: calc(100vh - 120px); /* Fit screen */
     }
     .order-column {
-      flex: 1; /* Equal width for each column */
+      flex: 1; /* Equal width */
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 20px; /* Increased gap for larger numbers */
       padding: 20px;
       border-radius: 10px;
-      overflow-y: auto; /* Scroll if too many orders */
     }
     .green-column {
       background-color: #009246;
@@ -51,7 +50,7 @@
     }
     .order-item {
       text-align: center;
-      font-size: 48px;
+      font-size: 96px; /* Doubled from 48px */
       font-weight: bold;
     }
     .green-column .order-item, .red-column .order-item {
@@ -62,13 +61,13 @@
     }
     @media (max-width: 800px) {
       .order-item {
-        font-size: 36px;
+        font-size: 72px; /* Doubled from 36px */
       }
       h1 {
         font-size: 48px;
       }
       .order-container {
-        flex-direction: column; /* Stack columns on small screens */
+        flex-direction: column; /* Stack on small screens */
       }
     }
   </style>
@@ -96,14 +95,21 @@
       whiteColumn.innerHTML = '';
       redColumn.innerHTML = '';
 
-      const perColumn = Math.ceil(orders.length / 3);
-      orders.forEach((order, index) => {
+      // Distribute orders to keep all columns populated
+      const minPerColumn = Math.floor(orders.length / 3);
+      const extraOrders = orders.length % 3;
+      let greenCount = minPerColumn + (extraOrders >= 1 ? 1 : 0);
+      let whiteCount = minPerColumn + (extraOrders >= 2 ? 1 : 0);
+      let redCount = minPerColumn;
+
+      let index = 0;
+      orders.forEach((order, i) => {
         const orderDiv = document.createElement('div');
         orderDiv.className = 'order-item';
         orderDiv.textContent = order;
-        if (index < perColumn) {
+        if (i < greenCount) {
           greenColumn.appendChild(orderDiv);
-        } else if (index < 2 * perColumn) {
+        } else if (i < greenCount + whiteCount) {
           whiteColumn.appendChild(orderDiv);
         } else {
           redColumn.appendChild(orderDiv);
