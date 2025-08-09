@@ -8,7 +8,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
 let orders = [];
-const PIN = '1234'; // Hardcoded PIN (change as needed)
+const PIN = '2001'; // Hardcoded PIN (change as needed)
 const SESSION_SECRET = 'your-secret-key'; // Simple secret for session
 
 // Middleware to check if user is authenticated
