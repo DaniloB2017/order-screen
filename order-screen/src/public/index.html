@@ -37,10 +37,10 @@
       text-align: center;
       font-size: 24px;
       font-weight: bold;
-      cursor: pointer; /* Indicate tappable */
+      cursor: pointer;
     }
     .order-item:hover {
-      background-color: #555555; /* Highlight on hover/tap */
+      background-color: #555555;
     }
     .controls {
       margin-top: 20px;
@@ -75,6 +75,11 @@
     <button onclick="removeOrder()">Remove Order</button>
   </div>
 
+  <audio id="addSound" preload="auto">
+    <source src="add-order.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
   <script>
     async function fetchOrders() {
       const response = await fetch('/orders');
@@ -89,14 +94,14 @@
         const orderDiv = document.createElement('div');
         orderDiv.className = 'order-item';
         orderDiv.textContent = order;
-        orderDiv.onclick = () => selectOrder(order); /* Tap to select */
+        orderDiv.onclick = () => selectOrder(order);
         grid.appendChild(orderDiv);
       });
     }
 
     function selectOrder(order) {
       const input = document.getElementById('orderInput');
-      input.value = order; /* Populate input with tapped order */
+      input.value = order;
     }
 
     async function addOrder() {
@@ -112,6 +117,7 @@
         if (result.success) {
           displayOrders(result.orders);
           input.value = '';
+          document.getElementById('addSound').play(); /* Play sound on success */
         } else {
           alert(result.error);
         }
