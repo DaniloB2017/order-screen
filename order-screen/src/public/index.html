@@ -75,11 +75,6 @@
     <button onclick="removeOrder()">Remove Order</button>
   </div>
 
-  <audio id="addSound" preload="auto">
-    <source src="add-order.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
-
   <script>
     async function fetchOrders() {
       const response = await fetch('/orders');
@@ -117,7 +112,6 @@
         if (result.success) {
           displayOrders(result.orders);
           input.value = '';
-          document.getElementById('addSound').play(); /* Play sound on success */
         } else {
           alert(result.error);
         }
@@ -149,6 +143,13 @@
 
     fetchOrders();
     setInterval(fetchOrders, 1000);
+
+    // Enter key to add order
+    document.getElementById('orderInput').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        addOrder();
+      }
+    });
   </script>
 </body>
 </html>
