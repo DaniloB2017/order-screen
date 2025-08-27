@@ -89,8 +89,14 @@
     <div class="order-column red-column" id="redColumn"></div>
   </div>
 
+  <audio id="addSound" preload="auto">
+    <source src="add-order.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
   <script>
     let orderAssignments = new Map();
+    let previousOrders = []; // Track previous order count
 
     async function fetchOrders() {
       const response = await fetch('/orders');
@@ -137,6 +143,12 @@
           redColumn.appendChild(orderDiv);
         }
       });
+
+      // Play sound if a new order was added
+      if (orders.length > previousOrders.length) {
+        document.getElementById('addSound').play();
+      }
+      previousOrders = orders;
     }
 
     fetchOrders();
