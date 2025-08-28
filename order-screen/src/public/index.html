@@ -97,6 +97,7 @@
     function selectOrder(order) {
       const input = document.getElementById('orderInput');
       input.value = order;
+      input.focus(); // Auto-focus on select
     }
 
     async function addOrder() {
@@ -112,11 +113,14 @@
         if (result.success) {
           displayOrders(result.orders);
           input.value = '';
+          input.focus(); // Auto-focus after add
         } else {
           alert(result.error);
+          input.focus(); // Auto-focus on error
         }
       } else {
         alert('Please enter a valid order number.');
+        input.focus(); // Auto-focus on error
       }
     }
 
@@ -133,11 +137,14 @@
         if (result.success) {
           displayOrders(result.orders);
           input.value = '';
+          input.focus(); // Auto-focus after remove
         } else {
           alert(result.error);
+          input.focus(); // Auto-focus on error
         }
       } else {
         alert('Please enter a valid order number.');
+        input.focus(); // Auto-focus on error
       }
     }
 
@@ -150,6 +157,9 @@
         addOrder();
       }
     });
+
+    // Auto-focus on page load
+    document.getElementById('orderInput').focus();
   </script>
 </body>
 </html>
