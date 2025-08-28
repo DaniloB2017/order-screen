@@ -96,12 +96,16 @@
 
   <script>
     let orderAssignments = new Map();
-    let previousOrders = []; // Track previous order count
+    let previousOrders = [];
 
     async function fetchOrders() {
-      const response = await fetch('/orders');
-      const orders = await response.json();
-      displayOrders(orders);
+      try {
+        const response = await fetch('/orders');
+        const orders = await response.json();
+        displayOrders(orders);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
     }
 
     function displayOrders(orders) {
@@ -146,7 +150,11 @@
 
       // Play sound if a new order was added
       if (orders.length > previousOrders.length) {
-        document.getElementById('addSound').play();
+        const audio = document.getElementById('addSound');
+        audio.currentTime = 0; // Reset to start
+        audio.play().catch(error => {
+          console.error('Error playing sound:', error);
+        });
       }
       previousOrders = orders;
     }
